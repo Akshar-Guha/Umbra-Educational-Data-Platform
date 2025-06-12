@@ -1,8 +1,19 @@
 # Copyright (c) 2024 Umbra. All rights reserved.
+<<<<<<< HEAD
 from sqlalchemy.orm import Session
 
 from src.data_engineering.db_utils import SessionLocal
 from src.data_engineering.database_models import Course
+=======
+import logging
+from sqlalchemy.orm import Session
+from sqlalchemy.exc import SQLAlchemyError
+import pandas as pd
+
+from src.data_engineering.db_utils import SessionLocal
+from src.data_engineering.database_models import Base, User, Course, Content, LearningProgress, Assessment, AssessmentResult, Interaction
+from src.data_collection.web_scraper import fetch_html_content, parse_html_content
+>>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
 from src.utils.logging_utils import setup_logging
 from src.api.v1.crud import create_course
 from src.api.v1.schemas import CourseCreate
@@ -10,7 +21,10 @@ from src.api.v1.schemas import CourseCreate
 # Setup logging
 logger = setup_logging(__name__)
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
 def validate_scraped_data(data: dict) -> bool:
     """Basic validation for scraped data. Expand this as needed."""
     if not isinstance(data, dict):
@@ -25,19 +39,27 @@ def validate_scraped_data(data: dict) -> bool:
         return False
     return True
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
 def ingest_course_data_batch(course_data_list: list[dict], session: Session) -> None:
     """Ingests a list of scraped course data into the database within a given session."""
     courses_to_add = []
     for course_data in course_data_list:
         if not validate_scraped_data(course_data):
+<<<<<<< HEAD
             logger.error(
                 f"Invalid course data provided for ingestion: {course_data}. Skipping."
             )
+=======
+            logger.error(f"Invalid course data provided for ingestion: {course_data}. Skipping.")
+>>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
             continue
 
         # Check if course already exists to prevent duplicates. This check remains
         # here as it's part of the ingestion *logic*, not just CRUD.
+<<<<<<< HEAD
         existing_course = (
             session.query(Course).filter_by(url=course_data["url"]).first()
         )
@@ -45,10 +67,16 @@ def ingest_course_data_batch(course_data_list: list[dict], session: Session) -> 
             logger.info(
                 f"Course with URL {course_data['url']} already exists. Skipping."
             )
+=======
+        existing_course = session.query(Course).filter_by(url=course_data["url"]).first()
+        if existing_course:
+            logger.info(f"Course with URL {course_data['url']} already exists. Skipping.")
+>>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
             continue
 
         # Use Pydantic model for validation before passing to CRUD
         try:
+<<<<<<< HEAD
             course_create = CourseCreate(
                 title=course_data.get("title"),
                 description=course_data.get("description"),
@@ -70,6 +98,19 @@ def ingest_course_data_batch(course_data_list: list[dict], session: Session) -> 
         logger.info(
             f"Successfully processed {len(courses_to_add)} new courses for ingestion."
         )
+=======
+            course_create = CourseCreate(title=course_data.get("title"), description=course_data.get("description"), url=course_data.get("url"))
+            courses_to_add.append(course_create)
+            logger.info(f"Prepared to ingest course: {course_data.get('title')}")
+        except Exception as e:
+            logger.error(f"Error validating course data with Pydantic: {e}. Skipping {course_data.get('title')}")
+            continue
+    
+    if courses_to_add:
+        for course_create in courses_to_add:
+            create_course(session, course_create) # create_course now raises custom exceptions
+        logger.info(f"Successfully processed {len(courses_to_add)} new courses for ingestion.")
+>>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
     else:
         logger.info("No new valid courses to ingest.")
 
@@ -83,28 +124,49 @@ if __name__ == "__main__":
         {
             "title": "Introduction to Python Programming",
             "description": "Learn the basics of Python programming, including data types, control structures, and functions.",
+<<<<<<< HEAD
             "url": "https://example.com/python-intro",
+=======
+            "url": "https://example.com/python-intro"
+>>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
         },
         {
             "title": "Advanced SQL for Data Analysis",
             "description": "Master complex SQL queries, window functions, and database optimization techniques for data analysis.",
+<<<<<<< HEAD
             "url": "https://example.com/advanced-sql",
+=======
+            "url": "https://example.com/advanced-sql"
+>>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
         },
         {
             "title": "Machine Learning with Scikit-learn",
             "description": "Explore supervised and unsupervised machine learning algorithms using the Scikit-learn library.",
+<<<<<<< HEAD
             "url": "https://example.com/ml-sklearn",
+=======
+            "url": "https://example.com/ml-sklearn"
+>>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
         },
         {
             "title": "Deep Learning with TensorFlow",
             "description": "Dive into neural networks, Keras, and building deep learning models for various applications.",
+<<<<<<< HEAD
             "url": "https://example.com/dl-tensorflow",
+=======
+            "url": "https://example.com/dl-tensorflow"
+>>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
         },
         {
             "title": "Web Scraping for Data Science",
             "description": "Learn how to extract data from websites using Python, BeautifulSoup, and Requests.",
+<<<<<<< HEAD
             "url": "https://example.com/web-scraping",
         },
+=======
+            "url": "https://example.com/web-scraping"
+        }
+>>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
     ]
 
     with SessionLocal() as session:
@@ -132,4 +194,8 @@ if __name__ == "__main__":
     #     with SessionLocal() as session:
     #         ingest_course_data_batch([dummy_course_data], session)
     # else:
+<<<<<<< HEAD
     #     logger.error(f"Failed to fetch HTML content from {sample_url}. Cannot ingest data.")
+=======
+    #     logger.error(f"Failed to fetch HTML content from {sample_url}. Cannot ingest data.") 
+>>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)

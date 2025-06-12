@@ -11,6 +11,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import QueuePool
 from dotenv import load_dotenv
 
+<<<<<<< HEAD
 # from urllib.parse import quote_plus # This is no longer needed
 
 from src.utils.logging_utils import setup_logging  # Import the new logging utility
@@ -36,19 +37,62 @@ logger.info(f"DEBUG: Constructed DATABASE_URL: {DATABASE_URL}")
 # --- End temporary debug prints ---
 
 # Configure engine with connection pooling
+=======
+from src.utils.logging_utils import setup_logging # Import the new logging utility
+
+# Load environment variables from .env file
+# Corrected path for .env at project root
+load_dotenv(dotenv_path=os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')), 'config', '.env'))
+
+# Setup logging
+logger = setup_logging(__name__) # Use the reusable setup_logging function
+
+# --- Configuration ---
+DB_HOST = os.getenv('DB_HOST', 'localhost')
+DB_PORT = os.getenv('DB_PORT', '5432')
+DB_NAME = os.getenv('DB_NAME', 'learning_platform_db')
+DB_USER = os.getenv('DB_USER', 'learning_user')
+DB_PASSWORD = os.getenv('DB_PASSWORD') # This will come from the .env file
+
+# Consider a more robust secret management solution for production
+# For portfolio, ensure .env is not committed and permissions are strict (e.g., 600)
+DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+
+# --- Temporary debug prints ---
+# logger.info(f"DEBUG: DB_USER: {DB_USER}")
+# logger.info(f"DEBUG: DB_PASSWORD (from .env): {DB_PASSWORD}")
+# logger.info(f"DEBUG: Constructed DATABASE_URL: {DATABASE_URL}")
+# --- End temporary debug prints ---
+
+# --- Connection Pooling ---
+# Configure engine with connection pooling
+# pool_size: The number of connections to keep open in the pool.
+# max_overflow: The number of connections that can be opened beyond the pool_size.
+# pool_recycle: Recycles connections after this many seconds. Prevents stale connections.
+# pool_timeout: Maximum wait time for a connection from the pool.
+>>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
 engine = create_engine(
     DATABASE_URL,
     poolclass=QueuePool,
     pool_size=10,
     max_overflow=20,
+<<<<<<< HEAD
     pool_recycle=3600,  # Recycle connections every hour
     pool_timeout=30,
     echo=False,  # Set to True for verbose SQLAlchemy logging (useful for debugging)
+=======
+    pool_recycle=3600, # Recycle connections every hour
+    pool_timeout=30,
+    echo=False # Set to True for verbose SQLAlchemy logging (useful for debugging)
+>>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
 # --- Error Handling & Retry Logic with Exponential Backoff ---
 def retry_db_operation(max_tries=5, base_delay=1):
     def decorator(func):
@@ -58,6 +102,7 @@ def retry_db_operation(max_tries=5, base_delay=1):
                 try:
                     return func(*args, **kwargs)
                 except Exception as e:
+<<<<<<< HEAD
                     logger.error(
                         f"Attempt {i + 1}/{max_tries} failed for {func.__name__}: {e}"
                     )
@@ -76,6 +121,19 @@ def retry_db_operation(max_tries=5, base_delay=1):
     return decorator
 
 
+=======
+                    logger.error(f"Attempt {i+1}/{max_tries} failed for {func.__name__}: {e}")
+                    if i < max_tries - 1:
+                        delay = base_delay * (2 ** i) # Exponential backoff
+                        logger.info(f"Retrying in {delay} seconds...")
+                        time.sleep(delay)
+                    else:
+                        logger.critical(f"All {max_tries} attempts failed for {func.__name__}. Giving up.")
+                        raise # Re-raise the last exception
+        return wrapper
+    return decorator
+
+>>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
 # --- Database Health Check ---
 @retry_db_operation(max_tries=3)
 def check_db_health():
@@ -89,7 +147,10 @@ def check_db_health():
         logger.error(f"Database health check failed: {e}")
         return False
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
 # --- Dependency for getting a database session (for FastAPI/API context) ---
 def get_db():
     """Dependency to get a database session."""
@@ -99,12 +160,16 @@ def get_db():
     finally:
         db.close()
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
 # --- SQL Injection Prevention Note ---
 # SQLAlchemy ORM and its Core Expression Language are designed to prevent SQL injection
 # by sanitizing inputs automatically. Avoid using f-strings or direct string formatting
 # for query parameters with user input. Always use parameter binding or ORM methods.
 # Example of safe query: session.query(User).filter(User.username == user_input).first()
+<<<<<<< HEAD
 # For raw SQL, always use text() with .bindparams():
 # session.execute(text("SELECT * FROM users WHERE username = :username").bindparams(username=user_input))
 
@@ -139,11 +204,18 @@ def drop_all_tables():
         return False
 
 
+=======
+# Example of unsafe query (DO NOT USE WITH USER INPUT): session.execute(f"SELECT * FROM users WHERE username = '{user_input}'")
+# For raw SQL, always use text() with .bindparams():
+# session.execute(text("SELECT * FROM users WHERE username = :username").bindparams(username=user_input))
+
+>>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
 if __name__ == "__main__":
     print("--- Database Utilities Module ---")
     print("Attempting database health check...")
     if check_db_health():
         print("Database is healthy!")
+<<<<<<< HEAD
 
         # Add a prompt to the user before dropping/creating tables
         response = input(
@@ -257,3 +329,20 @@ if __name__ == "__main__":
     # MLFLOW_TRACKING_URI=http://mlflow:5000
     # SECRET_KEY=a_very_long_and_random_string_for_security
     # API_KEY_EXTERNAL_SERVICE=your_external_api_key_here
+=======
+        # Example of using a session
+        try:
+            with SessionLocal() as session:
+                # You can add a simple query here to test session if tables exist
+                # from database_models import User
+                # users = session.query(User).limit(1).all()
+                # print(f"Found {len(users)} users (if any).")
+                pass
+        except Exception as e:
+            logger.error(f"Error during session test: {e}")
+    else:
+        print("Database is not healthy. Check logs for details.")
+
+    print("\nRemember to configure your `config/.env` file with correct DB credentials.")
+    print("Ensure .env file has secure permissions (e.g., 600) and is NOT committed to Git.") 
+>>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)

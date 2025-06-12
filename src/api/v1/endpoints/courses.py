@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Path, Query
 from sqlalchemy.orm import Session
+<<<<<<< HEAD
 from typing import List, Optional
 import json
 
@@ -7,12 +8,22 @@ from src.data_engineering.db_utils import get_db
 from src.data_collection.data_ingestion import validate_scraped_data
 from src.api.v1.schemas import CourseCreate, Course
 from src.api.v1 import crud  # Import the crud module
+=======
+from typing import List, Optional, Dict, Any
+import json
+
+from src.data_engineering.db_utils import get_db
+from src.data_collection.data_ingestion import ingest_course_data_batch, validate_scraped_data
+from src.api.v1.schemas import CourseCreate, Course
+from src.api.v1 import crud # Import the crud module
+>>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
 from src.utils.logging_utils import setup_logging
 
 logger = setup_logging(__name__)
 
 router = APIRouter()
 
+<<<<<<< HEAD
 
 @router.post(
     "/", summary="Ingest Course Data", tags=["Courses"], response_model=List[Course]
@@ -20,6 +31,10 @@ router = APIRouter()
 async def ingest_courses(
     course_data_list: List[CourseCreate], db: Session = Depends(get_db)
 ):
+=======
+@router.post("/", summary="Ingest Course Data", tags=["Courses"], response_model=List[Course])
+async def ingest_courses(course_data_list: List[CourseCreate], db: Session = Depends(get_db)):
+>>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
     """
     Ingests a list of course data into the database.
 
@@ -29,6 +44,7 @@ async def ingest_courses(
         raise HTTPException(status_code=400, detail="No course data provided.")
 
     valid_data_for_ingestion = [
+<<<<<<< HEAD
         course.dict()
         for course in course_data_list
         if validate_scraped_data(course.dict())
@@ -39,6 +55,13 @@ async def ingest_courses(
             status_code=400,
             detail="No valid course data found for ingestion after validation.",
         )
+=======
+        course.dict() for course in course_data_list if validate_scraped_data(course.dict())
+    ]
+
+    if not valid_data_for_ingestion:
+        raise HTTPException(status_code=400, detail="No valid course data found for ingestion after validation.")
+>>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
 
     try:
         ingested_courses = []
@@ -49,6 +72,7 @@ async def ingest_courses(
         return ingested_courses
     except Exception as e:
         logger.error(f"API - Error during course ingestion: {e}")
+<<<<<<< HEAD
         raise HTTPException(
             status_code=500, detail=f"Internal server error during ingestion: {e}"
         )
@@ -71,6 +95,18 @@ def read_courses(
         description='JSON string of key-value pairs for filtering (e.g., \'{"difficulty": "Beginner"}\').',
     ),
     db: Session = Depends(get_db),
+=======
+        raise HTTPException(status_code=500, detail=f"Internal server error during ingestion: {e}")
+
+@router.get("/", summary="Get All Courses", tags=["Courses"], response_model=List[Course])
+def read_courses(
+    skip: int = 0,
+    limit: int = 100,
+    sort_by: Optional[str] = Query(None, description="Field to sort by (e.g., 'title', 'difficulty')."),
+    sort_order: Optional[str] = Query("asc", description="Sort order: 'asc' for ascending, 'desc' for descending."),
+    filter_criteria: Optional[str] = Query(None, description="JSON string of key-value pairs for filtering (e.g., '{\"difficulty\": \"Beginner\"}')."),
+    db: Session = Depends(get_db)
+>>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
 ):
     """
     Retrieve a list of courses with optional pagination, filtering, and sorting.
@@ -88,9 +124,13 @@ def read_courses(
         try:
             parsed_filter_criteria = json.loads(filter_criteria)
         except json.JSONDecodeError:
+<<<<<<< HEAD
             raise HTTPException(
                 status_code=400, detail="Invalid JSON format for filter_criteria."
             )
+=======
+            raise HTTPException(status_code=400, detail="Invalid JSON format for filter_criteria.")
+>>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
 
     courses = crud.get_courses(
         db,
@@ -98,6 +138,7 @@ def read_courses(
         limit=limit,
         sort_by=sort_by,
         sort_order=sort_order,
+<<<<<<< HEAD
         filter_criteria=parsed_filter_criteria,
     )
     return courses
@@ -113,6 +154,14 @@ def read_course_by_url(
     course_url: str = Path(..., description="The URL of the course to retrieve."),
     db: Session = Depends(get_db),
 ):
+=======
+        filter_criteria=parsed_filter_criteria
+    )
+    return courses
+
+@router.get("/{course_url:path}", summary="Get Course by URL", tags=["Courses"], response_model=Course)
+def read_course_by_url(course_url: str = Path(..., description="The URL of the course to retrieve."), db: Session = Depends(get_db)):
+>>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
     """
     Retrieve a single course by its URL.
 
@@ -121,4 +170,8 @@ def read_course_by_url(
     db_course = crud.get_course_by_url(db, course_url)
     if db_course is None:
         raise HTTPException(status_code=404, detail="Course not found.")
+<<<<<<< HEAD
     return db_course
+=======
+    return db_course 
+>>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)

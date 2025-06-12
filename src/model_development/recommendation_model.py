@@ -3,7 +3,11 @@ from sklearn.metrics.pairwise import cosine_similarity
 from transformers import AutoTokenizer, AutoModel
 import torch
 
+<<<<<<< HEAD
 from src.preprocessing.data_preprocessor import fetch_courses_from_db, clean_course_data
+=======
+from src.preprocessing.data_preprocessor import fetch_courses_from_db, clean_course_data, feature_engineer_course_data
+>>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
 from src.utils.logging_utils import setup_logging
 
 # Setup logging
@@ -15,7 +19,10 @@ MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 model = AutoModel.from_pretrained(MODEL_NAME)
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
 def get_sentence_embeddings(texts: list[str]) -> torch.Tensor:
     """Generates sentence embeddings for a list of texts using a pre-trained Transformer model."""
     logger.info("Generating sentence embeddings...")
@@ -23,6 +30,7 @@ def get_sentence_embeddings(texts: list[str]) -> torch.Tensor:
     with torch.no_grad():
         model_output = model(**inputs)
     # Mean pooling to get sentence embeddings
+<<<<<<< HEAD
     sentence_embeddings = mean_pooling(model_output, inputs["attention_mask"])
     logger.info("Embeddings generated.")
     return sentence_embeddings
@@ -44,6 +52,19 @@ def mean_pooling(model_output, attention_mask):
 def get_recommendations(
     course_id: int, courses_df: pd.DataFrame, top_n: int = 5
 ) -> pd.DataFrame:
+=======
+    sentence_embeddings = mean_pooling(model_output, inputs['attention_mask'])
+    logger.info("Embeddings generated.")
+    return sentence_embeddings
+
+def mean_pooling(model_output, attention_mask):
+    """Performs mean pooling to get sentence embeddings."""
+    token_embeddings = model_output[0] # First element of model_output contains all token embeddings
+    input_mask_expanded = attention_mask.unsqueeze(-1).expand(token_embeddings.size()).float()
+    return torch.sum(token_embeddings * input_mask_expanded, 1) / torch.clamp(input_mask_expanded.sum(1), min=1e-9)
+
+def get_recommendations(course_id: int, courses_df: pd.DataFrame, top_n: int = 5) -> pd.DataFrame:
+>>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
     """Recommends similar courses based on content descriptions.
 
     Args:
@@ -56,31 +77,51 @@ def get_recommendations(
     """
     logger.info(f"Generating {top_n} recommendations for course ID: {course_id}")
 
+<<<<<<< HEAD
     if courses_df.empty or "description" not in courses_df.columns:
         logger.error("Courses DataFrame is empty or missing 'description' column.")
         return pd.DataFrame()
 
     target_course = courses_df[courses_df["id"] == course_id]
+=======
+    if courses_df.empty or 'description' not in courses_df.columns:
+        logger.error("Courses DataFrame is empty or missing 'description' column.")
+        return pd.DataFrame()
+
+    target_course = courses_df[courses_df['id'] == course_id]
+>>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
     if target_course.empty:
         logger.warning(f"Course with ID {course_id} not found.")
         return pd.DataFrame()
 
     # Generate embeddings for all course descriptions
+<<<<<<< HEAD
     all_descriptions = courses_df["description"].tolist()
+=======
+    all_descriptions = courses_df['description'].tolist()
+>>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
     course_embeddings = get_sentence_embeddings(all_descriptions)
 
     # Get embedding for the target course
     target_course_index = target_course.index[0]
+<<<<<<< HEAD
     target_embedding = course_embeddings[target_course_index].unsqueeze(
         0
     )  # Add batch dimension
+=======
+    target_embedding = course_embeddings[target_course_index].unsqueeze(0) # Add batch dimension
+>>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
 
     # Calculate cosine similarity between target course and all other courses
     similarities = cosine_similarity(target_embedding, course_embeddings).flatten()
 
     # Create a Series of similarities, excluding the target course itself
     similarity_scores = pd.Series(similarities, index=courses_df.index)
+<<<<<<< HEAD
     similarity_scores = similarity_scores.drop(target_course_index)  # Exclude self
+=======
+    similarity_scores = similarity_scores.drop(target_course_index) # Exclude self
+>>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
 
     # Sort by similarity and get top N recommendations
     top_recommendations_indices = similarity_scores.nlargest(top_n).index
@@ -89,7 +130,10 @@ def get_recommendations(
     logger.info(f"Recommendations generated for course ID {course_id}.")
     return recommended_courses
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
 if __name__ == "__main__":
     logger.info("--- Recommendation Model Module ---")
 
@@ -104,6 +148,7 @@ if __name__ == "__main__":
 
         # Example: Get recommendations for the first course in the DataFrame
         if not cleaned_df.empty:
+<<<<<<< HEAD
             first_course_id = cleaned_df["id"].iloc[0]
             logger.info(
                 f"Attempting to get recommendations for course ID: {first_course_id}"
@@ -126,3 +171,17 @@ if __name__ == "__main__":
         logger.error(
             "Failed to fetch or preprocess course data. Cannot run recommendation model."
         )
+=======
+            first_course_id = cleaned_df['id'].iloc[0]
+            logger.info(f"Attempting to get recommendations for course ID: {first_course_id}")
+            recommendations = get_recommendations(first_course_id, cleaned_df, top_n=3)
+
+            if not recommendations.empty:
+                logger.info(f"Top 3 recommendations for course ID {first_course_id}:\n{recommendations[['title', 'url']]}")
+            else:
+                logger.warning(f"No recommendations found for course ID {first_course_id}.")
+        else:
+            logger.warning("No courses available in the cleaned DataFrame to generate recommendations.")
+    else:
+        logger.error("Failed to fetch or preprocess course data. Cannot run recommendation model.") 
+>>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
