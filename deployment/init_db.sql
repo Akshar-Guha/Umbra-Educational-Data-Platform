@@ -8,10 +8,9 @@ DO
 $do$
 BEGIN
    IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'learning_user') THEN
-      CREATE USER learning_user WITH PASSWORD '1469';
-   ELSE
-      ALTER USER learning_user WITH PASSWORD '1469'; -- Update password if user already exists
+      CREATE USER learning_user;
    END IF;
+   ALTER USER learning_user WITH PASSWORD 'umbra'; -- Set the password for learning_user
 END
 $do$;
 

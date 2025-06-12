@@ -1,17 +1,4 @@
 # Copyright (c) 2024 Umbra. All rights reserved.
-<<<<<<< HEAD
-from fastapi import FastAPI, HTTPException, Request, status
-from fastapi.responses import JSONResponse
-
-from src.data_engineering.db_utils import check_db_health
-from src.utils.logging_utils import setup_logging
-from src.api.v1.endpoints import courses, recommendations, users  # Import users router
-from src.api.v1.exceptions import (
-    DatabaseError,
-    NotFoundError,
-    ConflictError,
-)  # Import custom exceptions
-=======
 from fastapi import FastAPI, Depends, HTTPException, Request, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
@@ -23,7 +10,6 @@ from src.utils.logging_utils import setup_logging
 from src.api.v1.schemas import CourseCreate
 from src.api.v1.endpoints import courses, recommendations
 from src.api.v1.exceptions import DatabaseError, NotFoundError, ConflictError # Import custom exceptions
->>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
 
 # Setup logging for the API
 logger = setup_logging(__name__)
@@ -32,22 +18,11 @@ app = FastAPI(
     title="Educational Data Science Platform API",
     description="API for managing educational content, learning progress, and recommendations.",
     version="1.0.0",
-<<<<<<< HEAD
-    root_path="/api/v1",  # Explicitly set the root path for the application
-=======
     root_path="/api/v1" # Explicitly set the root path for the application
->>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
 )
 
 # Include routers for different API functionalities.
 app.include_router(courses.router, prefix="/courses", tags=["Courses"])
-<<<<<<< HEAD
-app.include_router(
-    recommendations.router, prefix="/recommendations", tags=["Recommendations"]
-)
-app.include_router(users.router, tags=["Users"])  # Include the users router
-
-=======
 app.include_router(recommendations.router, prefix="/recommendations", tags=["Recommendations"])
 
 # --- Temporary Diagnostic Endpoint ---
@@ -58,7 +33,6 @@ def get_root_path(request: Request):
     This is a temporary diagnostic endpoint to debug prefixing issues.
     """
     return {"app_root_path": request.scope.get("root_path")}
->>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
 
 # --- Global Exception Handlers ---
 @app.exception_handler(DatabaseError)
@@ -69,10 +43,6 @@ async def database_exception_handler(request: Request, exc: DatabaseError):
         content={"message": exc.detail, "code": "database_error"},
     )
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
 @app.exception_handler(NotFoundError)
 async def not_found_exception_handler(request: Request, exc: NotFoundError):
     logger.warning(f"Resource not found: {exc.detail}")
@@ -81,10 +51,6 @@ async def not_found_exception_handler(request: Request, exc: NotFoundError):
         content={"message": exc.detail, "code": "not_found"},
     )
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
 @app.exception_handler(ConflictError)
 async def conflict_exception_handler(request: Request, exc: ConflictError):
     logger.warning(f"Conflict error: {exc.detail}")
@@ -93,28 +59,14 @@ async def conflict_exception_handler(request: Request, exc: ConflictError):
         content={"message": exc.detail, "code": "conflict_error"},
     )
 
-<<<<<<< HEAD
-
-@app.exception_handler(HTTPException)
-async def http_exception_handler(request: Request, exc: HTTPException):
-    logger.error(
-        f"HTTP Exception occurred: {exc.detail} (Status: {exc.status_code})",
-        exc_info=True,
-    )
-=======
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
     logger.error(f"HTTP Exception occurred: {exc.detail} (Status: {exc.status_code})", exc_info=True)
->>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
     return JSONResponse(
         status_code=exc.status_code,
         content={"message": exc.detail, "code": "http_error"},
     )
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
 @app.exception_handler(Exception)
 async def generic_exception_handler(request: Request, exc: Exception):
     logger.critical(f"An unhandled error occurred: {exc}", exc_info=True)
@@ -122,16 +74,8 @@ async def generic_exception_handler(request: Request, exc: Exception):
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={"message": "An unexpected error occurred.", "code": "server_error"},
     )
-<<<<<<< HEAD
-
-
 # --- End Global Exception Handlers ---
 
-
-=======
-# --- End Global Exception Handlers ---
-
->>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
 @app.get("/health", summary="Health Check", tags=["Monitoring"])
 def health_check():
     """
@@ -143,15 +87,7 @@ def health_check():
     else:
         # This will now be caught by the DatabaseError handler if it's a DB issue
         # or a generic HTTPException if check_db_health() raises a different HTTPException
-<<<<<<< HEAD
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Database connection failed",
-        )
-
-=======
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Database connection failed")
->>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
 
 # Remove redundant ingest-courses endpoint from main.py, as it's defined in courses.py
 # @app.post("/ingest-courses", summary="Ingest Course Data", tags=["Data Ingestion"])
@@ -184,11 +120,5 @@ def health_check():
 
 if __name__ == "__main__":
     import uvicorn
-<<<<<<< HEAD
-
-    logger.info("Starting FastAPI application...")
-    uvicorn.run(app, host="0.0.0.0", port=8000)
-=======
     logger.info("Starting FastAPI application...")
     uvicorn.run(app, host="0.0.0.0", port=8000) 
->>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)

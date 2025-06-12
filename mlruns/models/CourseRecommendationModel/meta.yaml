@@ -3,9 +3,5 @@ creation_timestamp: 1749737429483
 deployment_job_id: null
 deployment_job_state: null
 description: null
-<<<<<<< HEAD
-last_updated_timestamp: 1749909594406
-=======
-last_updated_timestamp: 1749737429491
->>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
+last_updated_timestamp: 1750066226322
 name: CourseRecommendationModel

@@ -1,0 +1,14 @@
+artifact_uri: file:///C:/Users/aksha/Documents/Data%20Project/mlruns/0/9952217980954c34b63f46bd8634ba9d/artifacts
+end_time: 1750066227553
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 9952217980954c34b63f46bd8634ba9d
+run_name: fun-ox-508
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1750066220030
+status: 3
+tags: []
+user_id: root

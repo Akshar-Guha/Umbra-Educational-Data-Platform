@@ -1,11 +1,9 @@
-import asyncio
 from logging.config import fileConfig
 import os
-from dotenv import load_dotenv
 
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
-from sqlalchemy.ext.asyncio import async_engine_from_config
+from sqlalchemy import create_engine
 
 from alembic import context
 
@@ -22,28 +20,8 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 # Load environment variables from .env file
-<<<<<<< HEAD
-# Corrected path to .env file at the project root
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-load_dotenv(dotenv_path=os.path.join(project_root, ".env"))
-
-# Remove individual DB_ environment variable retrieval
-# DB_HOST = os.getenv('DB_HOST', 'localhost')
-# DB_PORT = os.getenv('DB_PORT', '5432')
-# DB_NAME = os.getenv('DB_NAME', 'learning_platform_db')
-# DB_USER = os.getenv('DB_USER', 'learning_user')
-# DB_PASSWORD = os.getenv('DB_PASSWORD')
-
-# Get the full DATABASE_URL directly from environment
-DATABASE_URL = os.getenv("DATABASE_URL")
-
-# Ensure DATABASE_URL is set
-if not DATABASE_URL:
-    raise Exception("DATABASE_URL environment variable is not set for Alembic.")
-=======
 # Corrected path to .env file at the project root's config directory
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-load_dotenv(dotenv_path=os.path.join(project_root, "config", ".env"))
 
 # Get database connection details from environment variables
 DB_HOST = os.getenv('DB_HOST', 'localhost')
@@ -52,10 +30,9 @@ DB_NAME = os.getenv('DB_NAME', 'learning_platform_db')
 DB_USER = os.getenv('DB_USER', 'learning_user')
 DB_PASSWORD = os.getenv('DB_PASSWORD')
 
-# Construct the database URL. Using asyncpg driver for async engine.
-DATABASE_URL = f"postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+# Construct the database URL for synchronous connection (psycopg2)
+DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
->>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
 
 # add your model's MetaData object here
 # for 'autogenerate' support
@@ -81,12 +58,8 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-<<<<<<< HEAD
-    url = DATABASE_URL
-=======
     # Use the dynamically constructed DATABASE_URL
     url = DATABASE_URL # Use the DATABASE_URL defined above
->>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -105,37 +78,13 @@ def do_run_migrations(connection: Connection) -> None:
         context.run_migrations()
 
 
-async def run_async_migrations() -> None:
-    """In this scenario we need to create an Engine
-    and associate a connection with the context.
-
-    """
-
-    connectable = async_engine_from_config(
-        config.get_section(config.config_ini_section, {}),
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
-<<<<<<< HEAD
-        url=(
-            DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://")
-            if DATABASE_URL
-            else None
-        ),  # Ensure asyncpg dialect is used
-=======
-        url=DATABASE_URL # Pass the DATABASE_URL directly here as well
->>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
-    )
-
-    async with connectable.connect() as connection:
-        await connection.run_sync(do_run_migrations)
-
-    await connectable.dispose()
-
-
 def run_migrations_online() -> None:
     """Run migrations in 'online' mode."""
 
-    asyncio.run(run_async_migrations())
+    connectable = create_engine(DATABASE_URL, poolclass=pool.NullPool) # Use create_engine for synchronous connection
+
+    with connectable.connect() as connection:
+        do_run_migrations(connection)
 
 
 if context.is_offline_mode():

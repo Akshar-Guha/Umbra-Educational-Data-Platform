@@ -7,20 +7,8 @@ FASTAPI_BASE_URL = "http://localhost:8000/api/v1"
 
 st.set_page_config(layout="wide", page_title="Umbra Educational Data Platform")
 
-<<<<<<< HEAD
-
-# --- Helper Functions ---
-def fetch_courses(
-    skip: int = 0,
-    limit: int = 100,
-    sort_by: str = None,
-    sort_order: str = "asc",
-    filter_criteria: dict = None,
-):
-=======
 # --- Helper Functions ---
 def fetch_courses(skip: int = 0, limit: int = 100, sort_by: str = None, sort_order: str = "asc", filter_criteria: dict = None):
->>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
     params = {
         "skip": skip,
         "limit": limit,
@@ -32,42 +20,22 @@ def fetch_courses(skip: int = 0, limit: int = 100, sort_by: str = None, sort_ord
         params["filter_criteria"] = json.dumps(filter_criteria)
 
     try:
-<<<<<<< HEAD
-        response = requests.get(
-            f"{FASTAPI_BASE_URL}/courses/", params=params, timeout=(10, 10)
-        )
-        response.raise_for_status()  # Raise HTTPError for bad responses (4xx or 5xx)
-=======
         response = requests.get(f"{FASTAPI_BASE_URL}/courses/", params=params)
         response.raise_for_status() # Raise HTTPError for bad responses (4xx or 5xx)
->>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
         return response.json()
     except requests.exceptions.RequestException as e:
         st.error(f"Error fetching courses: {e}")
         return []
 
-<<<<<<< HEAD
-
-def post_course(course_data: dict):
-    try:
-        response = requests.post(
-            f"{FASTAPI_BASE_URL}/courses/", json=[course_data], timeout=(10, 10)
-        )
-=======
 def post_course(course_data: dict):
     try:
         response = requests.post(f"{FASTAPI_BASE_URL}/courses/", json=[course_data])
->>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
         response.raise_for_status()
         return response.json()
     except requests.exceptions.RequestException as e:
         st.error(f"Error ingesting course: {e}")
         return None
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
 # --- Streamlit UI ---
 st.title("🎓 Umbra Educational Data Platform")
 st.markdown("Browse and manage educational course data.")
@@ -81,19 +49,9 @@ with tab1:
     col1, col2, col3 = st.columns([1, 1, 1])
     with col1:
         st.subheader("Filtering")
-<<<<<<< HEAD
-        filter_title = st.text_input(
-            "Filter by Title (contains)"
-        )  # Implement partial match later
-        filter_difficulty = st.selectbox(
-            "Filter by Difficulty", [None, "Beginner", "Intermediate", "Advanced"]
-        )  # Example
-        filter_category = st.text_input("Filter by Category")  # Example
-=======
         filter_title = st.text_input("Filter by Title (contains)") # Implement partial match later
         filter_difficulty = st.selectbox("Filter by Difficulty", [None, "Beginner", "Intermediate", "Advanced"]) # Example
         filter_category = st.text_input("Filter by Category") # Example
->>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
 
     with col2:
         st.subheader("Sorting")
@@ -117,11 +75,7 @@ with tab1:
     courses = fetch_courses(
         sort_by=selected_sort_by,
         sort_order=sort_order,
-<<<<<<< HEAD
-        filter_criteria=current_filter_criteria if current_filter_criteria else None,
-=======
         filter_criteria=current_filter_criteria if current_filter_criteria else None
->>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
     )
 
     if courses:
@@ -129,19 +83,11 @@ with tab1:
         for course in courses:
             st.markdown(f"### {course['title']}")
             st.write(f"**URL:** {course['url']}")
-<<<<<<< HEAD
-            if course.get("description"):
-                st.write(f"**Description:** {course['description']}")
-            if course.get("difficulty"):
-                st.write(f"**Difficulty:** {course['difficulty']}")
-            if course.get("category"):
-=======
             if course.get('description'):
                 st.write(f"**Description:** {course['description']}")
             if course.get('difficulty'):
                 st.write(f"**Difficulty:** {course['difficulty']}")
             if course.get('category'):
->>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
                 st.write(f"**Category:** {course['category']}")
             st.markdown("--- ")
     else:
@@ -153,13 +99,7 @@ with tab2:
         title = st.text_input("Course Title", max_chars=255)
         description = st.text_area("Course Description")
         url = st.text_input("Course URL", max_chars=255)
-<<<<<<< HEAD
-        difficulty = st.selectbox(
-            "Difficulty", [None, "Beginner", "Intermediate", "Advanced"]
-        )
-=======
         difficulty = st.selectbox("Difficulty", [None, "Beginner", "Intermediate", "Advanced"])
->>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
         category = st.text_input("Category", max_chars=255)
 
         submitted = st.form_submit_button("Ingest Course")
@@ -180,8 +120,4 @@ with tab2:
                     st.success("Course ingested successfully!")
                     st.json(response_data)
                 else:
-<<<<<<< HEAD
-                    st.error("Failed to ingest course.")
-=======
                     st.error("Failed to ingest course.") 
->>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)

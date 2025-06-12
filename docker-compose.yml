@@ -5,36 +5,15 @@ services:
     image: postgres:13-alpine
     container_name: umbra_postgres_db
     environment:
-<<<<<<< HEAD
-      POSTGRES_DB: umbra_db
-      POSTGRES_USER: umbra_user
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-secure_postgres_password}
-=======
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
->>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
+      POSTGRES_DB: learning_platform_db
+      POSTGRES_USER: learning_user
+      POSTGRES_PASSWORD: umbra
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./deployment/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
     ports:
       - "5432:5432"
     healthcheck:
-<<<<<<< HEAD
-      test: ["CMD-SHELL", "pg_isready -U umbra_user -d umbra_db"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  backend:
-    build: .
-    container_name: umbra_fastapi_app
-    depends_on:
-      db:
-        condition: service_healthy
-    environment:
-      - DATABASE_URL=postgresql://umbra_user:${DB_PASSWORD:-secure_postgres_password}@db:5432/umbra_db
-      - ENVIRONMENT: development # Set to 'production' for deployment
-=======
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
@@ -43,37 +22,17 @@ services:
   web:
     build: .
     container_name: umbra_fastapi_app
-    command: uvicorn src.api.v1.main:app --host 0.0.0.0 --port 8000 --reload
->>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
+    command: bash -c "alembic upgrade head && uvicorn src.api.v1.main:app --host 0.0.0.0 --port 8000 --reload"
     volumes:
       - .:/app
     ports:
       - "8000:8000"
-<<<<<<< HEAD
-    command: uvicorn src.api.v1.main:app --host 0.0.0.0 --port 8000 --reload # --reload for local development
-
-  frontend:
-    build: 
-      context: ./frontend
-      dockerfile: Dockerfile # Assuming there's a Dockerfile inside the frontend folder
-    container_name: umbra_streamlit_app
-    ports:
-      - "8501:8501" # Default Streamlit port
-    depends_on:
-      - backend # Assuming frontend needs backend to be running
     environment:
-      BACKEND_URL: http://backend:8000 # Points to the backend service within Docker network
-
-volumes:
-  postgres_data:
-    driver: local 
-=======
-    environment:
-      DB_HOST: db # Connect to the 'db' service defined in this compose file
+      DB_HOST: db
       DB_PORT: 5432
-      DB_NAME: ${DB_NAME}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: learning_platform_db
+      DB_USER: learning_user
+      DB_PASSWORD: umbra
       # MLFLOW_TRACKING_URI: http://mlflow:5000 # Uncomment if MLflow server is added
     depends_on:
       db:
@@ -93,4 +52,3 @@ volumes:
 
 volumes:
   postgres_data: 
->>>>>>> 63e865f (Initial commit: Umbra Educational Data Platform)
