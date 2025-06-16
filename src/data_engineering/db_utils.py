@@ -59,7 +59,7 @@ def retry_db_operation(max_tries=5, base_delay=1):
                     return func(*args, **kwargs)
                 except Exception as e:
                     logger.error(
-                        f"Attempt {i+1}/{max_tries} failed for {func.__name__}: {e}"
+                        f"Attempt {i + 1}/{max_tries} failed for {func.__name__}: {e}"
                     )
                     if i < max_tries - 1:
                         delay = base_delay * (2**i)  # Exponential backoff

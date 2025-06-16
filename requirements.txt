@@ -20,6 +20,7 @@ asyncpg==0.29.0
 pydantic-settings==2.2.1
 
 # Machine Learning
+mlflow==2.13.0
 # tensorflow==2.12.0
 # torch==2.0.1
 # transformers==4.29.2
